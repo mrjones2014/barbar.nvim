@@ -1,16 +1,16 @@
 ---
 name: Bug report :D
 about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
-
+title: ""
+labels: ""
+assignees: ""
 ---
 
 Preamble (you can delete this section):
- - Are you using a recent build (november 2020 & up) of neovim 0.5?
- - If not, rebuild it now before reporting the issue.
- - Do you certify having read the [readme](https://github.com/romgrk/barbar.nvim#readme) or are ready for being shamed for not having read the manual?
+
+- Are you using a recent build (november 2020 & up) of neovim 0.5?
+- If not, rebuild it now before reporting the issue.
+- Do you certify having read the [readme](https://github.com/mrjones2014/winbarbar.nvim#readme) or are ready for being shamed for not having read the manual?
 
 **Description**
 
@@ -23,13 +23,14 @@ init.vim:
 ```vim
 let $PLUGIN_DIRECTORY = '~/.config/nvim/bundle'
 set runtimepath^=$PLUGIN_DIRECTORY/nvim-web-devicons
-set runtimepath^=$PLUGIN_DIRECTORY/barbar.nvim
+set runtimepath^=$PLUGIN_DIRECTORY/winbarbar.nvim
 
 " Set your options here
 let bufferline = {}
 ```
 
 Steps to reproduce the behavior:
+
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'

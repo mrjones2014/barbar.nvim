@@ -60,8 +60,8 @@ local bufferline = {}
 --- @param options? bufferline.Options
 function bufferline.setup(options)
   -- Create all necessary commands
-  create_user_command('BarbarEnable', render.enable, { desc = 'Enable barbar.nvim' })
-  create_user_command('BarbarDisable', render.disable, { desc = 'Disable barbar.nvim' })
+  create_user_command('WinbarbarEnable', render.enable, { desc = 'Enable barbar.nvim' })
+  create_user_command('WinbarbarDisable', render.disable, { desc = 'Disable barbar.nvim' })
 
   create_user_command('BufferNext', function(tbl)
     api.goto_buffer_relative(math.max(1, tbl.count))

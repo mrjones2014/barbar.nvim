@@ -1,14 +1,20 @@
 ![demo](./static/demo.gif)
 
 <h1 align="center">
-  barbar.nvim
+  winbarbar.nvim
 </h1>
 
 <p align="center">
   <b>Tabs, as understood by any other editor.</b>
 </p>
 
-`barbar.nvim` is a winbar bufferlist plugin with re-orderable, auto-sizing tabs,
+## Notice
+
+This is a _fork_ of [barbar.nvim](https://github.com/romgrk/barbar.nvim), but heavily modified
+to render into the winbar instead of tabline. Additionally, all animations are stripped out
+to simplify the code, since I don't like animations.
+
+`winbarbar.nvim` is a winbar bufferlist plugin with re-orderable, auto-sizing tabs,
 icons, nice highlighting, sort-by commands and a magic jump-to-buffer mode. Plus
 the tab names are made unique when two filenames match.
 
@@ -26,7 +32,7 @@ files you can even type the letter ahead from memory.
 - [Highlighting](#highlighting)
 - [Integration with filetree plugins](#integration-with-filetree-plugins)
 - [Known Issues](#known-issues)
-- [About Barbar](#about)
+- [About Winbarbar](#about)
 
 ## Install
 
@@ -34,14 +40,14 @@ files you can even type the letter ahead from memory.
 
 ```vim
 Plug 'kyazdani42/nvim-web-devicons'
-Plug 'romgrk/barbar.nvim'
+Plug 'mrjones2014/winbarbar.nvim'
 ```
 
 #### Using [packer.nvim](https://github.com/wbthomason/packer.nvim)
 
 ```lua
 use {
-  'romgrk/barbar.nvim',
+  'mrjones2014/winbarbar.nvim',
   requires = {'kyazdani42/nvim-web-devicons'}
 }
 ```
@@ -146,8 +152,8 @@ nnoremap <silent> <Space>bl <Cmd>BufferOrderByLanguage<CR>
 nnoremap <silent> <Space>bw <Cmd>BufferOrderByWindowNumber<CR>
 
 " Other:
-" :BarbarEnable - enables barbar (enabled by default)
-" :BarbarDisable - very bad command, should never be used
+" :winbarbarEnable - enables winbarbar (enabled by default)
+" :winbarbarDisable - very bad command, should never be used
 ```
 
 #### Lua
@@ -194,8 +200,8 @@ map('n', '<Space>bl', '<Cmd>BufferOrderByLanguage<CR>', opts)
 map('n', '<Space>bw', '<Cmd>BufferOrderByWindowNumber<CR>', opts)
 
 -- Other:
--- :BarbarEnable - enables barbar (enabled by default)
--- :BarbarDisable - very bad command, should never be used
+-- :winbarbarEnable - enables winbarbar (enabled by default)
+-- :winbarbarDisable - very bad command, should never be used
 ```
 
 ## Options
@@ -203,7 +209,7 @@ map('n', '<Space>bw', '<Cmd>BufferOrderByWindowNumber<CR>', opts)
 #### Vim Script
 
 ```vim
-" NOTE: If barbar's option dict isn't created yet, create it
+" NOTE: If winbarbar's option dict isn't created yet, create it
 let bufferline = get(g:, 'bufferline', {})
 
 " Enable/disable auto-hiding the tab bar when there is a single buffer

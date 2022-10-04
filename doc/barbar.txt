@@ -15,8 +15,8 @@ Help on barbar.vim                                                    *barbar*
 ==============================================================================
 1. Intro                                                        *barbar-intro*
 
-Barbar is a winbar plugin. It's called Barbar because it deals with the bar
-at the top of your window. And it does it well so it's more than a bar. Barbar.
+Winbarbar is a winbar plugin. It's called Winbarbar because it deals with the bar
+at the top of your window. And it does it well so it's more than a bar. Winbarbar.
 
 ==============================================================================
 2. Mappings & Commands                     *barbar-mappings* *barbar-commands*
@@ -71,15 +71,15 @@ The name of each command should be descriptive enough for you to use it.
     nnoremap <silent> <Space>bw :BufferOrderByWindowNumber<CR>
 
     " Other:
-    " :BarbarEnable - enables barbar (enabled by default)
-    " :BarbarDisable - very bad command, should never be used
+    " :WinbarbarEnable - enables barbar (enabled by default)
+    " :WinbarbarDisable - very bad command, should never be used
 <
 
 ==============================================================================
 3. Highlights                                              *barbar-highlights*
 ~
 
-Here are the groups that you should define if you'd like to style Barbar.
+Here are the groups that you should define if you'd like to style Winbarbar.
 
 >
     let fg_target = 'red'

@@ -1,5 +1,3 @@
--- !::exe [So]
-
 --- @type bufferline.utils.hl
 local hl = require('bufferline.utils').hl
 

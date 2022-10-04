@@ -1,9 +1,9 @@
 function! bufferline#enable()
-  BarbarEnable
+  WinbarbarEnable
 endfunc
 
 function! bufferline#disable()
-  BarbarDisable
+  WinbarbarDisable
 endfunc
 
 "========================

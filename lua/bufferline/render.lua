@@ -1,8 +1,3 @@
--- !::exe [luafile %]
---
--- render.lua
---
-
 local max = math.max
 local min = math.min
 local table_insert = table.insert
@@ -67,7 +62,7 @@ local function create_augroups()
   return create_augroup('bufferline', {}), create_augroup('bufferline_update', {})
 end
 
---- Create valid `&winbar` syntax which highlights the next item in the tabline with the highlight `group` specified.
+--- Create valid `&winbar` syntax which highlights the next item in the winbar with the highlight `group` specified.
 --- @param group string
 --- @return string syntax
 local function hl_winbar(group)
@@ -242,6 +237,10 @@ local render = {}
 --- Disable the bufferline
 function render.disable()
   create_augroups()
+  vim.o.winbar = ''
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    vim.wo[win].winbar = ''
+  end
   vim.cmd([[
     delfunction! BufferlineOnOptionChanged
   ]])
@@ -756,7 +755,7 @@ function render.render(update_names, refocus)
   if not ok then
     render.disable()
     notify(
-      'Barbar detected an error while running. Barbar disabled itself :/ '
+      'Winbarbar detected an error while running. Winbarbar disabled itself :/ '
         .. 'Include this in your report: '
         .. tostring(result),
       vim.log.levels.ERROR,
