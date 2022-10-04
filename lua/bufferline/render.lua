@@ -98,11 +98,7 @@ local _scroll = {
 
 --- @return bufferline.render.scroll
 local function get_scroll()
-  if vim.g.bufferline.use_winbar then
-    return _scroll[get_current_win()] or _scroll.default
-  else
-    return _scroll.default
-  end
+  return _scroll[get_current_win()] or _scroll.default
 end
 
 --- Concatenates some `groups` into a valid string.
@@ -251,52 +247,20 @@ local function slice_groups_left(groups, width)
   return new_groups
 end
 
---- Clears the tabline. Does not stop the tabline from being redrawn via autocmd.
---- @param tabline? string
-local function set_tabline(tabline)
-  last_tabline = tabline
-  vim.opt.tabline = last_tabline
-end
-
 --- @class bufferline.render
 local render = {}
-
---- What to do when clicking a buffer close button.
---- @param buffer integer
-function render.close_click_handler(buffer)
-  if buf_get_option(buffer, 'modified') then
-    buf_call(buffer, function()
-      command('w')
-    end)
-    exec_autocmds('BufModifiedSet', { buffer = buffer })
-  else
-    bbye.bdelete(false, buffer)
-  end
-end
 
 --- Disable the bufferline
 function render.disable()
   create_augroups()
-  set_tabline(nil)
   vim.cmd([[
-    delfunction! BufferlineCloseClickHandler
-    delfunction! BufferlineMainClickHandler
     delfunction! BufferlineOnOptionChanged
   ]])
-end
-
---- Opens a buffer.
---- @param bufnr integer
-local function open_buffer(layout, bufnr)
-  local buffer_data = state.get_buffer_data(bufnr)
-  buffer_data.real_width = Layout.calculate_width(buffer_data.name, layout.base_width, layout.padding_width)
-  buffer_data.width = 1
 end
 
 --- Open the `new_buffers` in the bufferline.
 local function open_buffers(new_buffers)
   local opts = vim.g.bufferline
-  local initial_buffers = #state.buffers
 
   -- Open next to the currently opened tab
   -- Find the new index where the tab will be inserted
@@ -434,10 +398,6 @@ function render.enable()
   create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
     callback = function()
       vim.defer_fn(function()
-        if not vim.g.bufferline.use_winbar then
-          return
-        end
-
         if
           utils.win_is_floating(get_current_win())
           or vim.tbl_contains(
@@ -483,16 +443,6 @@ function render.enable()
   })
 
   vim.cmd([[
-    " Must be global -_-
-    function! BufferlineCloseClickHandler(minwid, clicks, btn, modifiers) abort
-      call luaeval("require'bufferline.render'.close_click_handler(_A)", a:minwid)
-    endfunction
-
-    " Must be global -_-
-    function! BufferlineMainClickHandler(minwid, clicks, btn, modifiers) abort
-      call luaeval("require'bufferline.render'.main_click_handler(_A[1], nil, _A[2])", [a:minwid, a:btn])
-    endfunction
-
     " Must be global -_-
     function! BufferlineOnOptionChanged(dict, key, changes) abort
       call luaeval("require'bufferline.render'.on_option_changed(nil, _A)", a:key)
@@ -546,29 +496,6 @@ function render.get_updated_buffers(update_names)
   return state.buffers
 end
 
---- What to do when clicking a buffer label.
---- @param bufnr integer the buffer nummber
---- @param btn string
-function render.main_click_handler(bufnr, _, btn, _)
-  if bufnr == 0 then
-    return
-  end
-
-  -- NOTE: in Vimscript this was not `==`, it was a regex compare `=~`
-  if btn == 'm' then
-    bbye.bdelete(false, bufnr)
-  else
-    if vim.g.bufferline.use_winbar then
-      -- don't work properly in winbar since you can't detect
-      -- which window's bar was clicked
-      return
-    else
-      render.set_current_win_listed_buffer()
-      set_current_buf(bufnr)
-    end
-  end
-end
-
 --- What to do when `vim.g.bufferline` is changed.
 --- @param key string what option was changed.
 function render.on_option_changed(_, key, _)
@@ -601,7 +528,7 @@ function render.restore_buffers(bufnames)
   render.update()
 end
 
---- Open the window which contained the buffer which was clicked on.
+--- Open the window which contained the buffer which was switched to.
 --- @return integer current_bufnr
 function render.set_current_win_listed_buffer()
   local current = get_current_buf()
@@ -648,18 +575,6 @@ end
 local function generate_tabline(bufnrs, refocus)
   local opts = vim.g.bufferline
 
-  if opts.auto_hide and not vim.g.bufferline.use_winbar then
-    if #bufnrs <= 1 then
-      if vim.o.showtabline == 2 then
-        vim.o.showtabline = 0
-      end
-      return
-    end
-    if vim.o.showtabline == 0 then
-      vim.o.showtabline = 2
-    end
-  end
-
   local current = get_current_buf()
 
   -- Store current buffer to open new ones next to this one
@@ -671,7 +586,6 @@ local function generate_tabline(bufnrs, refocus)
     end
   end
 
-  local click_enabled = has('tablineat') and opts.clickable
   local has_close = opts.closable
   local has_icons = (opts.icons == true) or (opts.icons == 'both') or (opts.icons == 'buffer_number_with_icon')
   local has_icon_custom_colors = opts.icon_custom_colors
@@ -757,15 +671,6 @@ local function generate_tabline(bufnrs, refocus)
 
       closePrefix = namePrefix
       close = closeIcon .. ' '
-
-      if click_enabled then
-        closePrefix = '%' .. bufnr .. '@BufferlineCloseClickHandler@' .. closePrefix
-      end
-    end
-
-    local clickable = ''
-    if click_enabled then
-      clickable = '%' .. bufnr .. '@BufferlineMainClickHandler@'
     end
 
     local padding = (' '):rep(layout.padding_width)
@@ -777,12 +682,12 @@ local function generate_tabline(bufnrs, refocus)
         or layout.base_widths[i] + (2 * layout.padding_width),
       position = buffer_data.position or buffer_data.real_position,
       groups = {
-        { hl = clickable .. separatorPrefix, text = separator },
+        { hl = separatorPrefix, text = separator },
         { hl = '', text = padding },
         { hl = bufferIndexPrefix, text = bufferIndex },
-        { hl = clickable .. iconPrefix, text = icon },
+        { hl = iconPrefix, text = icon },
         { hl = jumpLetterPrefix, text = jumpLetter },
-        { hl = clickable .. namePrefix, text = name },
+        { hl = namePrefix, text = name },
         { hl = '', text = padding },
         { hl = '', text = ' ' },
         { hl = closePrefix, text = close },
@@ -857,9 +762,6 @@ local function generate_tabline(bufnrs, refocus)
   -- Render bufferline string
   result = result .. groups_to_string(bufferline_groups)
 
-  -- To prevent the expansion of the last click group
-  result = result .. '%0@BufferlineMainClickHandler@' .. hl_tabline('BufferTabpageFill')
-
   if layout.actual_width + strwidth(opts.icon_separator_inactive) <= layout.buffers_width and #items > 0 then
     result = result .. opts.icon_separator_inactive
   end
@@ -895,12 +797,10 @@ function render.update(update_names, refocus)
       { title = 'barbar.nvim' }
     )
 
-    return
-  elseif vim.g.bufferline.use_winbar then
-    return result
-  elseif result ~= last_tabline then
-    set_tabline(result)
+    return ''
   end
+
+  return result
 end
 
 return render

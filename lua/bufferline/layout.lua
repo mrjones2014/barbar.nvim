@@ -107,10 +107,7 @@ function Layout.calculate()
   local base_width = (has_icons and (1 + 1) or 0) -- icon + space-after-icon
     + 1 -- space-after-name
 
-  local available_width = vim.o.columns
-  if vim.g.bufferline.use_winbar then
-    available_width = win_get_width(0)
-  end
+  local available_width = win_get_width(0)
   available_width = available_width - state.offset.width
 
   local used_width, base_widths = Layout.calculate_buffers_width(base_width)

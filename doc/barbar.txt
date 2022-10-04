@@ -245,16 +245,6 @@ Controls if icons are rendered on each tab.
       \ 'asdfjkl;ghnmxcvbziowerutyqpASDFJKLGHNMXCVBZIOWERUTYQP'
 <
 
-                                                      *g:bufferline.clickable*
-`g:bufferline.clickable`  boolean  (default |v:true|)
-
-  If set, you can left-click on a tab to switch to that buffer, and
-  middle-click to delete it.
->
-    let g:bufferline.clickable = v:true
-<
-
-                                                     *g:bufferline.exclude_ft*
 `g:bufferline.exclude_ft`  string[]  (default |v:null|)
 
   Excludes filetypes from appearing in the tabs.
