@@ -14,6 +14,8 @@ This is a _fork_ of [barbar.nvim](https://github.com/romgrk/barbar.nvim), but he
 to render into the winbar instead of tabline. Additionally, all animations are stripped out
 to simplify the code, since I don't like animations.
 
+---
+
 `winbarbar.nvim` is a winbar bufferlist plugin with re-orderable, auto-sizing tabs,
 icons, nice highlighting, sort-by commands and a magic jump-to-buffer mode. Plus
 the tab names are made unique when two filenames match.
