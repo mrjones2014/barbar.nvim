@@ -1,4 +1,3 @@
-
 ![demo](./static/demo.gif)
 
 <h1 align="center">
@@ -19,24 +18,27 @@ stays constant for the lifetime of the buffer, so if you're working with a set o
 files you can even type the letter ahead from memory.
 
 ##### Table of content
- - [Install](#install)
- - [Features](#features)
- - [Usage](#usage)
- - [Options](#options)
- - [Highlighting](#highlighting)
- - [Integration with filetree plugins](#integration-with-filetree-plugins)
- - [Known Issues](#known-issues)
- - [About Barbar](#about)
+
+- [Install](#install)
+- [Features](#features)
+- [Usage](#usage)
+- [Options](#options)
+- [Highlighting](#highlighting)
+- [Integration with filetree plugins](#integration-with-filetree-plugins)
+- [Known Issues](#known-issues)
+- [About Barbar](#about)
 
 ## Install
 
 #### Using [vim-plug](https://github.com/junegunn/vim-plug)
+
 ```vim
 Plug 'kyazdani42/nvim-web-devicons'
 Plug 'romgrk/barbar.nvim'
 ```
 
 #### Using [packer.nvim](https://github.com/wbthomason/packer.nvim)
+
 ```lua
 use {
   'romgrk/barbar.nvim',
@@ -45,11 +47,12 @@ use {
 ```
 
 You can skip the dependency on `'kyazdani42/nvim-web-devicons'` if you
-[disable icons](#options).  If you want the icons, don't forget to
+[disable icons](#options). If you want the icons, don't forget to
 install [nerd fonts](https://www.nerdfonts.com/).
 
 ##### Requirements
- - Neovim `0.7`
+
+- Neovim `0.7`
 
 ## Features
 
@@ -209,9 +212,6 @@ map('n', '<Space>bw', '<Cmd>BufferOrderByWindowNumber<CR>', opts)
 " NOTE: If barbar's option dict isn't created yet, create it
 let bufferline = get(g:, 'bufferline', {})
 
-" Enable/disable animations
-let bufferline.animation = v:true
-
 " Enable/disable auto-hiding the tab bar when there is a single buffer
 let bufferline.auto_hide = v:false
 
@@ -281,9 +281,6 @@ let bufferline.no_name_title = v:null
 ```lua
 -- Set barbar's options
 require'bufferline'.setup {
-  -- Enable/disable animations
-  animation = true,
-
   -- Enable/disable auto-hiding the tab bar when there is a single buffer
   auto_hide = false,
 

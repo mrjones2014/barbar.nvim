@@ -12,14 +12,14 @@ local buf_get_option = vim.api.nvim_buf_get_option
 local bufwinnr = vim.fn.bufwinnr
 local matchlist = vim.fn.matchlist
 local split = vim.split
-local get_current_buf = require'bufferline.utils'.get_current_buf
-local get_current_win = require'bufferline.utils'.get_current_win
+local get_current_buf = require('bufferline.utils').get_current_buf
+local get_current_win = require('bufferline.utils').get_current_win
 
 --- @type bufferline.utils
-local utils = require'bufferline.utils'
+local utils = require('bufferline.utils')
 
 --- The character used to delimit paths (e.g. `/` or `\`).
-local separator = package.config:sub(1,1)
+local separator = package.config:sub(1, 1)
 
 --- @param name string
 --- @return string
@@ -91,18 +91,16 @@ return {
   --- @param second string
   --- @return string, string
   get_unique_name = function(first, second)
-    local first_parts  = split(first,  separator)
+    local first_parts = split(first, separator)
     local second_parts = split(second, separator)
 
     local length = 1
-    local first_result  = table_concat(utils.list_slice_from_end(first_parts, length),  separator)
+    local first_result = table_concat(utils.list_slice_from_end(first_parts, length), separator)
     local second_result = table_concat(utils.list_slice_from_end(second_parts, length), separator)
 
-    while first_result == second_result and
-          length < max(#first_parts, #second_parts)
-    do
+    while first_result == second_result and length < max(#first_parts, #second_parts) do
       length = length + 1
-      first_result  = table_concat(utils.list_slice_from_end(first_parts,  min(#first_parts, length)),  separator)
+      first_result = table_concat(utils.list_slice_from_end(first_parts, min(#first_parts, length)), separator)
       second_result = table_concat(utils.list_slice_from_end(second_parts, min(#second_parts, length)), separator)
     end
 

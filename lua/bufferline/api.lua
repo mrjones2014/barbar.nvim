@@ -12,31 +12,25 @@ local command = vim.api.nvim_command
 local getchar = vim.fn.getchar
 local notify = vim.notify
 local set_current_buf = vim.api.nvim_set_current_buf
-local get_current_buf = require'bufferline.utils'.get_current_buf
+local get_current_buf = require('bufferline.utils').get_current_buf
 
 -- TODO: remove `vim.fs and` after 0.8 release
 local normalize = vim.fs and vim.fs.normalize
 
---- @type bufferline.animate
-local animate = require'bufferline.animate'
-
 --- @type bbye
-local bbye = require'bufferline.bbye'
+local bbye = require('bufferline.bbye')
 
 --- @type bufferline.JumpMode
-local JumpMode = require'bufferline.jump_mode'
-
---- @type bufferline.Layout
-local Layout = require'bufferline.layout'
+local JumpMode = require('bufferline.jump_mode')
 
 --- @type bufferline.render
-local render = require'bufferline.render'
+local render = require('bufferline.render')
 
 --- @type bufferline.state
-local state = require'bufferline.state'
+local state = require('bufferline.state')
 
 --- @type bufferline.utils
-local utils = require'bufferline.utils'
+local utils = require('bufferline.utils')
 
 --- Shows an error that `bufnr` was not among the `state.buffers`
 --- @param bufnr integer
@@ -44,7 +38,7 @@ local function notify_buffer_not_found(bufnr)
   notify(
     'Current buffer (' .. bufnr .. ") not found in bufferline.nvim's list of buffers: " .. vim.inspect(state.buffers),
     vim.log.levels.ERROR,
-    {title = 'barbar.nvim'}
+    { title = 'barbar.nvim' }
   )
 end
 
@@ -168,38 +162,7 @@ function api.goto_buffer_relative(steps)
   set_current_buf(state.buffers[idx])
 end
 
-local move_animation = nil
-local move_animation_data = nil
-
---- An incremental animation for `move_buffer_animated`.
-local function move_buffer_animated_tick(ratio, current_animation)
-  local data = move_animation_data
-
-  for _, current_number in ipairs(state.buffers) do
-    local current_data = state.get_buffer_data(current_number)
-
-    if current_animation.running == true then
-      current_data.position = animate.lerp(
-        ratio,
-        data.previous_positions[current_number],
-        data.next_positions[current_number]
-      )
-    else
-      current_data.position = nil
-      current_data.moving = false
-    end
-  end
-
-  render.update()
-
-  if current_animation.running == false then
-    move_animation = nil
-    move_animation_data = nil
-  end
-end
-
-local MOVE_DURATION = 150
---- Move a buffer (with animation, if configured).
+--- Move a buffer.
 --- @param from_idx integer the buffer's original index.
 --- @param to_idx integer the buffer's new index.
 local function move_buffer(from_idx, to_idx)
@@ -210,51 +173,9 @@ local function move_buffer(from_idx, to_idx)
 
   local bufnr = state.buffers[from_idx]
 
-  local previous_positions
-  if vim.g.bufferline.animation == true then
-    previous_positions = Layout.calculate_buffers_position_by_buffer_number()
-  end
-
   table_remove(state.buffers, from_idx)
   table_insert(state.buffers, to_idx, bufnr)
   state.sort_pins_to_left()
-
-  if vim.g.bufferline.animation == true then
-    local current_index = utils.index_of(state.buffers, bufnr)
-    local start_index = min(from_idx, current_index)
-    local end_index   = max(from_idx, current_index)
-
-    if start_index == end_index then
-      return
-    elseif move_animation ~= nil then
-      animate.stop(move_animation)
-    end
-
-    local next_positions = Layout.calculate_buffers_position_by_buffer_number()
-
-    for i, _ in ipairs(state.buffers) do
-      local current_number = state.buffers[i]
-      local current_data = state.get_buffer_data(current_number)
-
-      local previous_position = previous_positions[current_number]
-      local next_position     = next_positions[current_number]
-
-      if next_position ~= previous_position then
-        current_data.position = previous_positions[current_number]
-        current_data.moving = true
-      end
-    end
-
-    move_animation_data = {
-      previous_positions = previous_positions,
-      next_positions = next_positions,
-    }
-
-    move_animation =
-      animate.start(MOVE_DURATION, 0, 1, vim.v.t_float,
-        function(ratio, current_animation) move_buffer_animated_tick(ratio, current_animation) end)
-  end
-
   render.update()
 end
 
@@ -296,54 +217,65 @@ end
 
 --- Order the buffers by their buffer number.
 function api.order_by_buffer_number()
-  table_sort(state.buffers, function(a, b) return a < b end)
+  table_sort(state.buffers, function(a, b)
+    return a < b
+  end)
   render.update()
 end
 
 --- Order the buffers by their parent directory.
 function api.order_by_directory()
-  table_sort(state.buffers, with_pin_order(function(a, b)
-    local name_of_a = buf_get_name(a)
-    local name_of_b = buf_get_name(b)
-    local a_less_than_b = name_of_b < name_of_a
+  table_sort(
+    state.buffers,
+    with_pin_order(function(a, b)
+      local name_of_a = buf_get_name(a)
+      local name_of_b = buf_get_name(b)
+      local a_less_than_b = name_of_b < name_of_a
 
-    -- TODO: remove this block after 0.8 releases
-    if not normalize then
-      local a_is_relative = utils.is_relative_path(name_of_a)
-      if a_is_relative and utils.is_relative_path(name_of_b) then
-        return a_less_than_b
+      -- TODO: remove this block after 0.8 releases
+      if not normalize then
+        local a_is_relative = utils.is_relative_path(name_of_a)
+        if a_is_relative and utils.is_relative_path(name_of_b) then
+          return a_less_than_b
+        end
+
+        return a_is_relative
       end
 
-      return a_is_relative
-    end
+      local level_of_a = #vim.split(normalize(name_of_a), '/')
+      local level_of_b = #vim.split(normalize(name_of_b), '/')
 
-    local level_of_a = #vim.split(normalize(name_of_a), '/')
-    local level_of_b = #vim.split(normalize(name_of_b), '/')
+      if level_of_a ~= level_of_b then
+        return level_of_a < level_of_b
+      end
 
-    if level_of_a ~= level_of_b then
-      return level_of_a < level_of_b
-    end
-
-    return a_less_than_b
-  end))
+      return a_less_than_b
+    end)
+  )
 
   render.update()
 end
 
 --- Order the buffers by filetype.
 function api.order_by_language()
-  table_sort(state.buffers, with_pin_order(function(a, b)
-    return buf_get_option(a, 'filetype') < buf_get_option(b, 'filetype')
-  end))
+  table_sort(
+    state.buffers,
+    with_pin_order(function(a, b)
+      return buf_get_option(a, 'filetype') < buf_get_option(b, 'filetype')
+    end)
+  )
 
   render.update()
 end
 
 --- Order the buffers by their respective window number.
 function api.order_by_window_number()
-  table_sort(state.buffers, with_pin_order(function(a, b)
-    return bufwinnr(buf_get_name(a)) < bufwinnr(buf_get_name(b))
-  end))
+  table_sort(
+    state.buffers,
+    with_pin_order(function(a, b)
+      return bufwinnr(buf_get_name(a)) < bufwinnr(buf_get_name(b))
+    end)
+  )
 
   render.update()
 end
@@ -369,11 +301,11 @@ function api.pick_buffer()
       if JumpMode.buffer_by_letter[letter] ~= nil then
         set_current_buf(JumpMode.buffer_by_letter[letter])
       else
-        notify("Couldn't find buffer", vim.log.levels.WARN, {title = 'barbar.nvim'})
+        notify("Couldn't find buffer", vim.log.levels.WARN, { title = 'barbar.nvim' })
       end
     end
   else
-    notify("Invalid input", vim.log.levels.WARN, {title = 'barbar.nvim'})
+    notify('Invalid input', vim.log.levels.WARN, { title = 'barbar.nvim' })
   end
 
   render.update()
@@ -385,9 +317,7 @@ end
 --- @param text? string text to put in the offset
 --- @param hl? string
 function api.set_offset(width, text, hl)
-  state.offset = width > 0 and
-    {hl = hl, text = text, width = width} or
-    {hl = nil, text = nil, width = 0}
+  state.offset = width > 0 and { hl = hl, text = text, width = width } or { hl = nil, text = nil, width = 0 }
 
   render.update()
 end

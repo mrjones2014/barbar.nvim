@@ -11,7 +11,7 @@ local matchstr = vim.fn.matchstr
 local notify = vim.notify
 
 --- @type bufferline.utils.hl
-local hl = require'bufferline.utils'.hl
+local hl = require('bufferline.utils').hl
 
 local status, web = pcall(require, 'nvim-web-devicons')
 
@@ -31,11 +31,11 @@ return {
     for _, group in ipairs(hl_groups) do
       hl.set(
         group.icon_hl .. group.buffer_status,
-        hl.bg_or_default({'Buffer' .. group.buffer_status}, 'none'),
-        hl.fg_or_default({group.icon_hl}, 'none')
+        hl.bg_or_default({ 'Buffer' .. group.buffer_status }, 'none'),
+        hl.fg_or_default({ group.icon_hl }, 'none')
       )
     end
- end,
+  end,
 
   --- @param buffer_name string
   --- @param filetype string
@@ -44,11 +44,11 @@ return {
   get_icon = function(buffer_name, filetype, buffer_status)
     if status == false then
       notify(
-        'barbar: bufferline.icons is set to v:true but "nvim-dev-icons" was not found.' ..
-          '\nbarbar: icons have been disabled. Set `bufferline.icons` to `false` or ' ..
-          'install "nvim-dev-icons" to disable this message.',
+        'barbar: bufferline.icons is set to v:true but "nvim-dev-icons" was not found.'
+          .. '\nbarbar: icons have been disabled. Set `bufferline.icons` to `false` or '
+          .. 'install "nvim-dev-icons" to disable this message.',
         vim.log.levels.WARN,
-        {title = 'barbar.nvim'}
+        { title = 'barbar.nvim' }
       )
       command('let g:bufferline.icons = v:false')
       return '', ''
@@ -79,8 +79,8 @@ return {
     if icon_hl and hlexists(icon_hl .. buffer_status) < 1 then
       hl.set(
         icon_hl .. buffer_status,
-        hl.bg_or_default({'Buffer' .. buffer_status}, 'none'),
-        hl.fg_or_default({icon_hl}, 'none')
+        hl.bg_or_default({ 'Buffer' .. buffer_status }, 'none'),
+        hl.fg_or_default({ icon_hl }, 'none')
       )
       table_insert(hl_groups, { buffer_status = buffer_status, icon_hl = icon_hl })
     end

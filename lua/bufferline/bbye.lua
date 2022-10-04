@@ -38,13 +38,13 @@ local win_get_buf = vim.api.nvim_win_get_buf
 local win_is_valid = vim.api.nvim_win_is_valid
 local buf_get_option = vim.api.nvim_buf_get_option
 local buf_set_option = vim.api.nvim_buf_set_option
-local get_current_buf = require'bufferline.utils'.get_current_buf
+local get_current_buf = require('bufferline.utils').get_current_buf
 
 --- @type bufferline.state
-local state = require'bufferline.state'
+local state = require('bufferline.state')
 
 --- @type bufferline.utils
-local utils = require'bufferline.utils'
+local utils = require('bufferline.utils')
 
 -------------------
 -- Section: helpers
@@ -53,7 +53,7 @@ local utils = require'bufferline.utils'
 --- Use `vim.notify` to print an error `msg`
 --- @param msg string
 local function err(msg)
-  notify(msg, vim.log.levels.ERROR, {title = 'bbye'})
+  notify(msg, vim.log.levels.ERROR, { title = 'bbye' })
   vim.v.errmsg = msg
 end
 
@@ -62,7 +62,7 @@ local empty_buffer = nil
 --- Create a new buffer.
 --- @param force boolean if `true`, forcefully create the new buffer
 local function new(force)
-  command("enew" .. (force and '!' or ''))
+  command('enew' .. (force and '!' or ''))
 
   empty_buffer = get_current_buf()
   vim.b.empty_buffer = true
@@ -77,8 +77,10 @@ local function new(force)
 
   create_autocmd('BufWipeout', {
     buffer = 0,
-    callback = function() state.close_buffer(empty_buffer) end,
-    group = create_augroup('bbye_empty_buffer', {})
+    callback = function()
+      state.close_buffer(empty_buffer)
+    end,
+    group = create_augroup('bbye_empty_buffer', {}),
   })
 end
 
@@ -100,7 +102,7 @@ function bbye.delete(action, force, buffer, mods, focus_id)
   mods = mods or ''
 
   if buffer_number < 0 then
-    err("E516: No buffers were deleted. No match for " .. buffer)
+    err('E516: No buffers were deleted. No match for ' .. buffer)
     return
   end
 
@@ -108,7 +110,7 @@ function bbye.delete(action, force, buffer, mods, focus_id)
   local has_confirm = vim.o.confirm or mods:match('conf') ~= nil
 
   if is_modified and not (force or has_confirm) then
-    err("E89: No write since last change for buffer " .. buffer_number .. " (add ! to override)")
+    err('E89: No write since last change for buffer ' .. buffer_number .. ' (add ! to override)')
     return
   end
 
@@ -135,7 +137,7 @@ function bbye.delete(action, force, buffer, mods, focus_id)
         if previous_buffer > 0 and buflisted(previous_buffer) == 1 then
           set_current_buf(previous_buffer)
         else
-          command 'bprevious'
+          command('bprevious')
         end
       end)
 
@@ -163,7 +165,7 @@ function bbye.delete(action, force, buffer, mods, focus_id)
   -- buffer to still _exist_ even though it won't be :bdelete-able.
   if buflisted(buffer_number) == 1 and buffer_number ~= get_current_buf() then
     local no_errors = pcall(function()
-      command(mods .. " " .. action .. (force and '!' or '') .. " " .. buffer_number)
+      command(mods .. ' ' .. action .. (force and '!' or '') .. ' ' .. buffer_number)
     end)
 
     if not no_errors then

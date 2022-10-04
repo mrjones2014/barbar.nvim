@@ -14,10 +14,10 @@ local list_extend = vim.list_extend
 local tbl_filter = vim.tbl_filter
 
 --- @type bufferline.buffer
-local Buffer = require'bufferline.buffer'
+local Buffer = require('bufferline.buffer')
 
 --- @type bufferline.utils
-local utils = require'bufferline.utils'
+local utils = require('bufferline.utils')
 
 local PIN = 'bufferline_pin'
 
@@ -46,7 +46,7 @@ local state = {
   --- @field hl nil|string the highlight group to use
   --- @field text nil|string the text to fill the offset with
   --- @field width integer the size of the offset
-  offset = {width = 0}
+  offset = { width = 0 },
 }
 
 --- Get the state of the `id`
@@ -75,8 +75,8 @@ function state.get_buffer_list()
   local buffers = list_bufs()
   local result = {}
 
-  local exclude_ft   = vim.g.bufferline.exclude_ft
- local exclude_name = vim.g.bufferline.exclude_name
+  local exclude_ft = vim.g.bufferline.exclude_ft
+  local exclude_name = vim.g.bufferline.exclude_name
 
   for _, buffer in ipairs(buffers) do
     if not buf_get_option(buffer, 'buflisted') then
@@ -141,7 +141,9 @@ end
 --- @param bufnr integer
 --- @param do_name_update? boolean refreshes all buffer names iff `true`
 function state.close_buffer(bufnr, do_name_update)
-  state.buffers = tbl_filter(function(b) return b ~= bufnr end, state.buffers)
+  state.buffers = tbl_filter(function(b)
+    return b ~= bufnr
+  end, state.buffers)
   state.buffers_by_id[bufnr] = nil
 
   if do_name_update then
@@ -156,7 +158,9 @@ end
 -- @return int|nil
 function state.find_next_buffer(buffer_number)
   local index = utils.index_of(state.buffers, buffer_number)
-  if index == nil then return nil end
+  if index == nil then
+    return nil
+  end
   if index + 1 > #state.buffers then
     index = index - 1
     if index <= 0 then
@@ -183,9 +187,7 @@ function state.update_names()
       local other_i = buffer_index_by_name[name]
       local other_n = state.buffers[other_i]
       local new_name, new_other_name =
-        Buffer.get_unique_name(
-          buf_get_name(buffer_n),
-          buf_get_name(state.buffers[other_i]))
+        Buffer.get_unique_name(buf_get_name(buffer_n), buf_get_name(state.buffers[other_i]))
 
       state.get_buffer_data(buffer_n).name = new_name
       state.get_buffer_data(other_n).name = new_other_name
@@ -193,7 +195,6 @@ function state.update_names()
       buffer_index_by_name[new_other_name] = other_i
       buffer_index_by_name[name] = nil
     end
-
   end
 end
 
@@ -205,9 +206,9 @@ function state.set_offset(width, text, hl)
   vim.notify(
     "`require'bufferline.state'.set_offset` is deprecated, use `require'bufferline.api'.set_offset` instead",
     vim.log.levels.WARN,
-    {title = 'barbar.nvim'}
+    { title = 'barbar.nvim' }
   )
-  require'bufferline.api'.set_offset(width, text, hl)
+  require('bufferline.api').set_offset(width, text, hl)
 end
 
 -- Exports

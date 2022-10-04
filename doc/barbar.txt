@@ -152,11 +152,6 @@ Here are the groups that you should define if you'd like to style Barbar.
 4. Settings                                                  *barbar-settings*
 ~
 
-                                                      *g:bufferline.animation*
-`g:bufferline.animation` boolean  (default |v:true|)
-
-  Enables animations.
-
                                                       *g:bufferline.auto_hide*
 `g:bufferline.auto_hide`  boolean  (default |v:false|)
 

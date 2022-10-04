@@ -77,7 +77,7 @@ return {
   get_current_win = get_current_win,
   win_is_floating = win_is_floating,
   basename = function(path)
-     return fnamemodify(path, ':t')
+    return fnamemodify(path, ':t')
   end,
 
   --- Return whether element `n` is in a `list.
@@ -140,8 +140,8 @@ return {
     --- Set the default highlight `group_name` as a link to `link_name`
     --- @param group_name string the name of the group to by-default be linked to `link_name`
     --- @param link_name string the name of the group to by-default link `group_name` to
-    set_default_link = function (group_name, link_name)
-      set_hl(0, group_name, {default = true, link = link_name})
+    set_default_link = function(group_name, link_name)
+      set_hl(0, group_name, { default = true, link = link_name })
     end,
   },
 
@@ -176,4 +176,3 @@ return {
     return reversed
   end,
 }
-
