@@ -8,7 +8,6 @@ local min = math.min
 local table_insert = table.insert
 local table_concat = table.concat
 
-local buf_call = vim.api.nvim_buf_call
 local buf_delete = vim.api.nvim_buf_delete
 local buf_get_lines = vim.api.nvim_buf_get_lines
 local buf_get_name = vim.api.nvim_buf_get_name
@@ -21,15 +20,12 @@ local command = vim.api.nvim_command
 local create_augroup = vim.api.nvim_create_augroup
 local create_autocmd = vim.api.nvim_create_autocmd
 local defer_fn = vim.defer_fn
-local exec_autocmds = vim.api.nvim_exec_autocmds
-local has = vim.fn.has
 local haslocaldir = vim.fn.haslocaldir
 local list_bufs = vim.api.nvim_list_bufs
 local list_tabpages = vim.api.nvim_list_tabpages
 local list_wins = vim.api.nvim_list_wins
 local notify = vim.notify
 local schedule = vim.schedule
-local set_current_buf = vim.api.nvim_set_current_buf
 local set_current_win = vim.api.nvim_set_current_win
 local strcharpart = vim.fn.strcharpart
 local strwidth = vim.api.nvim_strwidth
@@ -40,9 +36,6 @@ local tbl_filter = vim.tbl_filter
 local win_get_buf = vim.api.nvim_win_get_buf
 local get_current_win = vim.api.nvim_get_current_win
 local get_current_buf = require('bufferline.utils').get_current_buf
-
---- @type bbye
-local bbye = require('bufferline.bbye')
 
 --- @type bufferline.buffer
 local Buffer = require('bufferline.buffer')
@@ -68,20 +61,16 @@ local utils = require('bufferline.utils')
 --- The highlight to use based on the state of a buffer.
 local HL_BY_ACTIVITY = { 'Inactive', 'Visible', 'Current' }
 
---- Last value for tabline
---- @type nil|string
-local last_tabline
-
 --- Create and reset autocommand groups associated with this plugin.
 --- @return integer bufferline, integer bufferline_update
 local function create_augroups()
   return create_augroup('bufferline', {}), create_augroup('bufferline_update', {})
 end
 
---- Create valid `&tabline` syntax which highlights the next item in the tabline with the highlight `group` specified.
+--- Create valid `&winbar` syntax which highlights the next item in the tabline with the highlight `group` specified.
 --- @param group string
 --- @return string syntax
-local function hl_tabline(group)
+local function hl_winbar(group)
   return '%#' .. group .. '#'
 end
 
@@ -109,7 +98,7 @@ local function groups_to_string(groups)
 
   for _, group in ipairs(groups) do
     -- NOTE: We have to escape the text in case it contains '%', which is a special character to the
-    --       tabline.
+    --       winbar.
     --       To escape '%', we make it '%%'. It just so happens that '%' is also a special character
     --       in Lua, so we have write '%%' to mean '%'.
     result = result .. group.hl .. group.text:gsub('%%', '%%%%')
@@ -311,7 +300,9 @@ function render.enable()
   create_autocmd('BufDelete', {
     callback = function(tbl)
       JumpMode.unassign_letter_for(tbl.buf)
-      schedule(render.update)
+      schedule(function()
+        command('redrawstatus')
+      end)
     end,
     group = augroup_bufferline,
   })
@@ -323,7 +314,6 @@ function render.enable()
       local is_modified = buf_get_option(tbl.buf, 'modified')
       if is_modified ~= vim.b[tbl.buf].checked then
         buf_set_var(tbl.buf, 'checked', is_modified)
-        render.update()
       end
     end,
     group = augroup_bufferline,
@@ -370,31 +360,6 @@ function render.enable()
     pattern = 'SessionSavePre',
   })
 
-  create_autocmd('BufNew', {
-    callback = function()
-      render.update(true)
-    end,
-    group = augroup_bufferline_update,
-  })
-
-  create_autocmd({
-    'BufEnter',
-    'BufWinEnter',
-    'BufWinLeave',
-    'BufWipeout',
-    'BufWritePost',
-    'SessionLoadPost',
-    'TabEnter',
-    'VimResized',
-    'WinEnter',
-    'WinLeave',
-  }, {
-    callback = function()
-      render.update()
-    end,
-    group = augroup_bufferline_update,
-  })
-
   create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
     callback = function()
       vim.defer_fn(function()
@@ -411,7 +376,7 @@ function render.enable()
         then
           vim.wo.winbar = ''
         else
-          vim.wo.winbar = "%{%v:lua.require'bufferline.render'.update()%}"
+          vim.wo.winbar = "%{%v:lua.require'bufferline.render'.render()%}"
         end
       end, 1)
     end,
@@ -420,7 +385,7 @@ function render.enable()
 
   create_autocmd('OptionSet', {
     callback = function()
-      render.update()
+      command('redrawstatus')
     end,
     group = augroup_bufferline_update,
     pattern = 'buflisted',
@@ -428,7 +393,9 @@ function render.enable()
 
   create_autocmd('WinClosed', {
     callback = function()
-      schedule(render.update)
+      schedule(function()
+        command('redrawstatus')
+      end)
     end,
     group = augroup_bufferline_update,
   })
@@ -436,7 +403,7 @@ function render.enable()
   create_autocmd('TermOpen', {
     callback = function()
       defer_fn(function()
-        render.update(true)
+        command('redrawstatus')
       end, 500)
     end,
     group = augroup_bufferline_update,
@@ -451,8 +418,7 @@ function render.enable()
     call dictwatcheradd(g:bufferline, '*', 'BufferlineOnOptionChanged')
   ]])
 
-  render.update()
-  command('redrawtabline')
+  command('redrawstatus')
 end
 
 --- Refresh the buffer list.
@@ -525,7 +491,7 @@ function render.restore_buffers(bufnames)
     table_insert(state.buffers, bufadd(name))
   end
 
-  render.update()
+  command('redrawstatus')
 end
 
 --- Open the window which contained the buffer which was switched to.
@@ -568,11 +534,11 @@ function render.set_scroll(target)
   get_scroll().target = target
 end
 
---- Generate the `&tabline` representing the current state of Neovim.
+--- Generate the `&winbar` representing the current state of Neovim.
 --- @param bufnrs integer[] the bufnrs to render
 --- @param refocus? boolean if `true`, the bufferline will be refocused on the current buffer (default: `true`)
 --- @return nil|string syntax
-local function generate_tabline(bufnrs, refocus)
+local function generate_winbar(bufnrs, refocus)
   local opts = vim.g.bufferline
 
   local current = get_current_buf()
@@ -617,10 +583,10 @@ local function generate_tabline(bufnrs, refocus)
     local status = HL_BY_ACTIVITY[activity]
     local mod = is_modified and 'Mod' or ''
 
-    local separatorPrefix = hl_tabline('Buffer' .. status .. 'Sign')
+    local separatorPrefix = hl_winbar('Buffer' .. status .. 'Sign')
     local separator = is_inactive and opts.icon_separator_inactive or opts.icon_separator_active
 
-    local namePrefix = hl_tabline('Buffer' .. status .. mod)
+    local namePrefix = hl_winbar('Buffer' .. status .. mod)
     local name = buffer_name
 
     -- The buffer name
@@ -638,7 +604,7 @@ local function generate_tabline(bufnrs, refocus)
     if has_buffer_number or has_numbers then
       local number_text = has_buffer_number and tostring(bufnr) or tostring(i)
 
-      bufferIndexPrefix = hl_tabline('Buffer' .. status .. 'Index')
+      bufferIndexPrefix = hl_winbar('Buffer' .. status .. 'Index')
       bufferIndex = number_text .. ' '
     end
 
@@ -650,14 +616,14 @@ local function generate_tabline(bufnrs, refocus)
         name = strcharpart(name, 1)
       end
 
-      jumpLetterPrefix = hl_tabline('Buffer' .. status .. 'Target')
+      jumpLetterPrefix = hl_winbar('Buffer' .. status .. 'Target')
       jumpLetter = (letter or '') .. (has_icons and (' ' .. (letter and '' or ' ')) or '')
     else
       if has_icons then
         local iconChar, iconHl = icons.get_icon(buffer_name, buf_get_option(bufnr, 'filetype'), status)
         local hlName = is_inactive and 'BufferInactive' or iconHl
-        iconPrefix = has_icon_custom_colors and hl_tabline('Buffer' .. status .. 'Icon')
-          or hlName and hl_tabline(hlName)
+        iconPrefix = has_icon_custom_colors and hl_winbar('Buffer' .. status .. 'Icon')
+          or hlName and hl_winbar(hlName)
           or namePrefix
         icon = iconChar .. ' '
       end
@@ -712,7 +678,7 @@ local function generate_tabline(bufnrs, refocus)
     current_buffer_position = current_buffer_position + item.width
   end
 
-  -- Create actual tabline string
+  -- Create actual winbar string
   local result = ''
 
   -- Add offset filler & text (for filetree/sidebar plugins)
@@ -720,7 +686,7 @@ local function generate_tabline(bufnrs, refocus)
     local offset_available_width = state.offset.width - 2
     local groups = {
       {
-        hl = hl_tabline(state.offset.hl or 'BufferOffset'),
+        hl = hl_winbar(state.offset.hl or 'BufferOffset'),
         text = ' ' .. (state.offset.text or ''),
       },
     }
@@ -733,7 +699,7 @@ local function generate_tabline(bufnrs, refocus)
   -- Add bufferline
   local bufferline_groups =
     { {
-      hl = hl_tabline('BufferTabpageFill'),
+      hl = hl_winbar('BufferTabpageFill'),
       text = (' '):rep(layout.actual_width),
     } }
 
@@ -772,20 +738,20 @@ local function generate_tabline(bufnrs, refocus)
     result = result .. '%=%#BufferTabpages# ' .. tostring(current_tabpage) .. '/' .. tostring(total_tabpages) .. ' '
   end
 
-  result = result .. hl_tabline('BufferTabpageFill')
+  result = result .. hl_winbar('BufferTabpageFill')
 
   return result
 end
 
---- Update `&tabline`
+--- Update `&winbar`
 --- @param refocus? boolean if `true`, the bufferline will be refocused on the current buffer (default: `true`)
 --- @param update_names? boolean whether to refresh the names of the buffers (default: `false`)
-function render.update(update_names, refocus)
+function render.render(update_names, refocus)
   if vim.g.SessionLoad then
     return
   end
 
-  local ok, result = xpcall(generate_tabline, debug.traceback, render.get_updated_buffers(update_names), refocus)
+  local ok, result = xpcall(generate_winbar, debug.traceback, render.get_updated_buffers(update_names), refocus)
 
   if not ok then
     render.disable()

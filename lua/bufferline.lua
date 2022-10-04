@@ -45,7 +45,6 @@ local DEFAULT_OPTIONS = {
   no_name_title = nil,
   semantic_letters = true,
   tabpages = true,
-  use_winbar = true,
   winbar_disabled_filetypes = {},
   winbar_disabled_buftypes = {},
 }

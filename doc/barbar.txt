@@ -15,7 +15,7 @@ Help on barbar.vim                                                    *barbar*
 ==============================================================================
 1. Intro                                                        *barbar-intro*
 
-Barbar is a tabline plugin. It's called Barbar because it deals with the bar
+Barbar is a winbar plugin. It's called Barbar because it deals with the bar
 at the top of your window. And it does it well so it's more than a bar. Barbar.
 
 ==============================================================================

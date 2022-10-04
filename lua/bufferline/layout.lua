@@ -18,7 +18,7 @@ local Buffer = require('bufferline.buffer')
 --- @type bufferline.state
 local state = require('bufferline.state')
 
---- The number of sides of each buffer in the tabline.
+--- The number of sides of each buffer in the winbar.
 local SIDES_OF_BUFFER = 2
 
 --- @class bufferline.layout.data

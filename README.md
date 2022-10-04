@@ -8,7 +8,7 @@
   <b>Tabs, as understood by any other editor.</b>
 </p>
 
-`barbar.nvim` is a tabline plugin with re-orderable, auto-sizing tabs,
+`barbar.nvim` is a winbar bufferlist plugin with re-orderable, auto-sizing tabs,
 icons, nice highlighting, sort-by commands and a magic jump-to-buffer mode. Plus
 the tab names are made unique when two filenames match.
 
@@ -215,15 +215,15 @@ let bufferline.tabpages = v:true
 " Enable/disable close button
 let bufferline.closable = v:true
 
-" Excludes buffers from the tabline
+" Excludes buffers from the winbar
 let bufferline.exclude_ft = ['javascript']
 let bufferline.exclude_name = ['package.json']
 
 " Enable/disable icons
-" if set to 'buffer_number', will show buffer number in the tabline
-" if set to 'numbers', will show buffer index in the tabline
-" if set to 'both', will show buffer index and icons in the tabline
-" if set to 'buffer_number_with_icon', will show buffer number and icons in the tabline
+" if set to 'buffer_number', will show buffer number in the winbar
+" if set to 'numbers', will show buffer index in the winbar
+" if set to 'both', will show buffer index and icons in the winbar
+" if set to 'buffer_number_with_icon', will show buffer number and icons in the winbar
 let bufferline.icons = v:true
 
 " Sets the icon's highlight group.

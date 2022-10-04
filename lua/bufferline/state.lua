@@ -41,7 +41,7 @@ local state = {
   buffers = {},
   buffers_by_id = {},
 
-  --- The offset of the tabline (from the left).
+  --- The offset of the winbar (from the left).
   --- @class bufferline.render.offset
   --- @field hl nil|string the highlight group to use
   --- @field text nil|string the text to fill the offset with

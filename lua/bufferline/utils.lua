@@ -11,11 +11,7 @@ local set_hl = vim.api.nvim_set_hl
 --- return the window in which the winbar is currently rendering
 --- @return number
 local function get_current_win()
-  if vim.g.bufferline.use_winbar then
-    return vim.fn.win_getid(vim.fn.winnr())
-  end
-
-  return vim.api.nvim_get_current_win()
+  return vim.fn.win_getid(vim.fn.winnr())
 end
 
 --- Get the current buffer;
@@ -23,11 +19,7 @@ end
 --- in the window in which the winbar is currently rendering
 --- @return number
 local function get_current_buf()
-  if vim.g.bufferline.use_winbar then
-    return vim.api.nvim_win_get_buf(get_current_win())
-  end
-
-  return vim.api.nvim_get_current_buf()
+  return vim.api.nvim_win_get_buf(get_current_win())
 end
 
 local function win_is_floating(winnr)

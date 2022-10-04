@@ -11,11 +11,11 @@ endfunc
 "========================
 
 function! bufferline#update(...)
-  call luaeval("require'bufferline.render'.update(_A)", get(a:, 1, v:null))
+  call luaeval("require'bufferline.render'.render(_A)", get(a:, 1, v:null))
 endfu
 
 function! bufferline#update_async(...)
-  call timer_start(get(a:, 2, 1), {-> luaeval("require'bufferline.render'.update(_A)", get(a:, 1, v:null))})
+  call timer_start(get(a:, 2, 1), {-> luaeval("require'bufferline.render'.render(_A)", get(a:, 1, v:null))})
 endfu
 
 function! bufferline#render(update_names) abort

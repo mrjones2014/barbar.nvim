@@ -72,8 +72,6 @@ function api.close_all_but_current()
       bbye.bdelete(false, bufnr)
     end
   end
-
-  render.update()
 end
 
 --- Close all open buffers, except pinned ones.
@@ -83,8 +81,6 @@ function api.close_all_but_pinned()
       bbye.bdelete(false, bufnr)
     end
   end
-
-  render.update()
 end
 
 --- Close all open buffers, except pinned ones or the current one.
@@ -96,8 +92,6 @@ function api.close_all_but_current_or_pinned()
       bbye.bdelete(false, bufnr)
     end
   end
-
-  render.update()
 end
 
 --- Close all buffers which are visually left of the current buffer.
@@ -110,8 +104,6 @@ function api.close_buffers_left()
   for i = idx - 1, 1, -1 do
     bbye.bdelete(false, state.buffers[i])
   end
-
-  render.update()
 end
 
 --- Close all buffers which are visually right of the current buffer.
@@ -124,8 +116,6 @@ function api.close_buffers_right()
   for i = #state.buffers, idx + 1, -1 do
     bbye.bdelete(false, state.buffers[i])
   end
-
-  render.update()
 end
 
 --- Set the current buffer to the `number`
@@ -176,14 +166,11 @@ local function move_buffer(from_idx, to_idx)
   table_remove(state.buffers, from_idx)
   table_insert(state.buffers, to_idx, bufnr)
   state.sort_pins_to_left()
-  render.update()
 end
 
 --- Move the current buffer to the index specified.
 --- @param idx integer
 function api.move_current_buffer_to(idx)
-  render.update()
-
   if idx == -1 then
     idx = #state.buffers
   end
@@ -202,8 +189,6 @@ end
 --- Move the current buffer a certain number of times over.
 --- @param steps integer
 function api.move_current_buffer(steps)
-  render.update()
-
   local current_bufnr = get_current_buf()
   local idx = utils.index_of(state.buffers, current_bufnr)
 
@@ -220,7 +205,6 @@ function api.order_by_buffer_number()
   table_sort(state.buffers, function(a, b)
     return a < b
   end)
-  render.update()
 end
 
 --- Order the buffers by their parent directory.
@@ -252,8 +236,6 @@ function api.order_by_directory()
       return a_less_than_b
     end)
   )
-
-  render.update()
 end
 
 --- Order the buffers by filetype.
@@ -264,8 +246,6 @@ function api.order_by_language()
       return buf_get_option(a, 'filetype') < buf_get_option(b, 'filetype')
     end)
   )
-
-  render.update()
 end
 
 --- Order the buffers by their respective window number.
@@ -276,8 +256,6 @@ function api.order_by_window_number()
       return bufwinnr(buf_get_name(a)) < bufwinnr(buf_get_name(b))
     end)
   )
-
-  render.update()
 end
 
 --- Activate the buffer pick mode.
@@ -285,13 +263,6 @@ function api.pick_buffer()
   if JumpMode.reinitialize then
     JumpMode.initialize_indexes()
   end
-
-  state.is_picking_buffer = true
-
-  render.update()
-  command('redrawtabline')
-
-  state.is_picking_buffer = false
 
   local ok, byte = pcall(getchar)
   if ok then
@@ -307,9 +278,6 @@ function api.pick_buffer()
   else
     notify('Invalid input', vim.log.levels.WARN, { title = 'barbar.nvim' })
   end
-
-  render.update()
-  command('redrawtabline')
 end
 
 --- Offset the rendering of the bufferline
@@ -318,15 +286,13 @@ end
 --- @param hl? string
 function api.set_offset(width, text, hl)
   state.offset = width > 0 and { hl = hl, text = text, width = width } or { hl = nil, text = nil, width = 0 }
-
-  render.update()
 end
 
 --- Toggle the `bufnr`'s "pin" state, visually.
 --- @param bufnr? integer
 function api.toggle_pin(bufnr)
   state.toggle_pin(bufnr or 0)
-  render.update()
+  command('redrawstatus')
 end
 
 return api
