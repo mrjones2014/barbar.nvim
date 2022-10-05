@@ -77,11 +77,11 @@ function Layout.calculate_buffers_width(base_width)
 
       local is_pinned = state.is_pinned(buffer_number)
 
+      local is_modified = buf_get_option(buffer_number, 'modified')
       if is_pinned then
-        local is_modified = buf_get_option(buffer_number, 'modified')
-        local icon = is_pinned and opts.icon_pinned or (is_modified and opts.icon_modified)
-
-        width = width + strwidth(icon) + 1 -- space-after-close-icon
+        width = width + strwidth(opts.icon_pinned) + 1 -- space after icon
+      elseif is_modified then
+        width = width + strwidth(opts.icon_modified) + 1 -- space after icon
       end
     end
     sum = sum + width

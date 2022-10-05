@@ -621,13 +621,14 @@ local function generate_winbar(bufnrs, refocus)
       end
     end
 
-    local closePrefix = ''
-    local close = ''
+    local tabIconPrefix = ''
+    local tabIcon = ''
     if is_pinned then
-      local closeIcon = is_pinned and opts.icon_pinned or (is_modified and opts.icon_modified)
-
-      closePrefix = namePrefix
-      close = closeIcon .. ' '
+      tabIconPrefix = namePrefix
+      tabIcon = opts.icon_pinned .. ' '
+    elseif is_modified then
+      tabIconPrefix = namePrefix
+      tabIcon = opts.icon_modified .. ' '
     end
 
     local padding = (' '):rep(layout.padding_width)
@@ -647,7 +648,7 @@ local function generate_winbar(bufnrs, refocus)
         { hl = namePrefix, text = name },
         { hl = '', text = padding },
         { hl = '', text = ' ' },
-        { hl = closePrefix, text = close },
+        { hl = tabIconPrefix, text = tabIcon },
         { hl = separatorPrefix, text = separator },
       },
     }
