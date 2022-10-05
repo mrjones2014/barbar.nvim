@@ -648,6 +648,7 @@ local function generate_winbar(bufnrs, refocus)
         { hl = '', text = padding },
         { hl = '', text = ' ' },
         { hl = closePrefix, text = close },
+        { hl = separatorPrefix, text = separator },
       },
     }
 
@@ -718,10 +719,6 @@ local function generate_winbar(bufnrs, refocus)
 
   -- Render bufferline string
   result = result .. groups_to_string(bufferline_groups)
-
-  if layout.actual_width + strwidth(opts.icon_separator_inactive) <= layout.buffers_width and #items > 0 then
-    result = result .. opts.icon_separator_inactive
-  end
 
   local current_tabpage = tabpagenr()
   local total_tabpages = tabpagenr('$')
