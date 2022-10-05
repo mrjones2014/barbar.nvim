@@ -27,12 +27,10 @@ local state = require('bufferline.state')
 --- @field exclude_name string[]
 local DEFAULT_OPTIONS = {
   auto_hide = false,
-  closable = true,
   exclude_ft = {},
   exclude_name = {},
-  icon_close_tab = '',
-  icon_close_tab_modified = '●',
-  icon_pinned = '',
+  icon_modified = '●',
+  icon_pinned = '',
   icon_separator_active = '▎',
   icon_separator_inactive = '▎',
   icons = true,
@@ -45,8 +43,8 @@ local DEFAULT_OPTIONS = {
   no_name_title = nil,
   semantic_letters = true,
   tabpages = true,
-  winbar_disabled_filetypes = {},
-  winbar_disabled_buftypes = {},
+  disabled_filetypes = {},
+  disabled_buftypes = {},
 }
 
 -------------------------------

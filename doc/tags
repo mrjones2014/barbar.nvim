@@ -7,7 +7,6 @@ barbar-mappings	barbar.txt	/*barbar-mappings*
 barbar-settings	barbar.txt	/*barbar-settings*
 barbar.txt	barbar.txt	/*barbar.txt*
 g:bufferline.auto_hide	barbar.txt	/*g:bufferline.auto_hide*
-g:bufferline.closable	barbar.txt	/*g:bufferline.closable*
 g:bufferline.exclude_name	barbar.txt	/*g:bufferline.exclude_name*
 g:bufferline.icon_close_tab	barbar.txt	/*g:bufferline.icon_close_tab*
 g:bufferline.icon_close_tab_modified	barbar.txt	/*g:bufferline.icon_close_tab_modified*

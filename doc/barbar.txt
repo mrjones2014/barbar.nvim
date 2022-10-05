@@ -220,11 +220,6 @@ Controls if icons are rendered on each tab.
   If true, new buffers appear at the end of the list. Default is to
   open after the current buffer.
 
-                                                       *g:bufferline.closable*
-`g:bufferline.closable`  boolean  (default |v:true|)
-
-  Controls if close buttons are shown.
-
                                                *g:bufferline.semantic_letters*
 `g:bufferline.semantic_letters`  boolean  (default |v:true|)
 

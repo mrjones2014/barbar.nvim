@@ -364,14 +364,8 @@ function render.enable()
       vim.defer_fn(function()
         if
           utils.win_is_floating(get_current_win())
-          or vim.tbl_contains(
-            vim.g.bufferline.winbar_disabled_filetypes or {},
-            buf_get_option(get_current_buf(), 'filetype')
-          )
-          or vim.tbl_contains(
-            vim.g.bufferline.winbar_disabled_buftypes or {},
-            buf_get_option(get_current_buf(), 'buftype')
-          )
+          or vim.tbl_contains(vim.g.bufferline.disabled_filetypes or {}, buf_get_option(get_current_buf(), 'filetype'))
+          or vim.tbl_contains(vim.g.bufferline.disabled_buftypes or {}, buf_get_option(get_current_buf(), 'buftype'))
         then
           vim.wo.winbar = ''
         else
@@ -551,7 +545,6 @@ local function generate_winbar(bufnrs, refocus)
     end
   end
 
-  local has_close = opts.closable
   local has_icons = (opts.icons == true) or (opts.icons == 'both') or (opts.icons == 'buffer_number_with_icon')
   local has_icon_custom_colors = opts.icon_custom_colors
   local has_buffer_number = (opts.icons == 'buffer_numbers') or (opts.icons == 'buffer_number_with_icon')
@@ -630,9 +623,8 @@ local function generate_winbar(bufnrs, refocus)
 
     local closePrefix = ''
     local close = ''
-    if has_close or is_pinned then
-      local closeIcon = is_pinned and opts.icon_pinned
-        or (not is_modified and opts.icon_close_tab or opts.icon_close_tab_modified)
+    if is_pinned then
+      local closeIcon = is_pinned and opts.icon_pinned or (is_modified and opts.icon_modified)
 
       closePrefix = namePrefix
       close = closeIcon .. ' '

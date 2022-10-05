@@ -77,14 +77,9 @@ function Layout.calculate_buffers_width(base_width)
 
       local is_pinned = state.is_pinned(buffer_number)
 
-      if opts.closable or is_pinned then
+      if is_pinned then
         local is_modified = buf_get_option(buffer_number, 'modified')
-        local icon = is_pinned and opts.icon_pinned
-          or (
-            not is_modified -- close-icon
-              and opts.icon_close_tab
-            or opts.icon_close_tab_modified
-          )
+        local icon = is_pinned and opts.icon_pinned or (is_modified and opts.icon_modified)
 
         width = width + strwidth(icon) + 1 -- space-after-close-icon
       end
