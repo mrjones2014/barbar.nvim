@@ -289,13 +289,6 @@ end
 function render.enable()
   local augroup_bufferline, augroup_bufferline_update = create_augroups()
 
-  create_autocmd('BufEnter', {
-    callback = function()
-      command('redrawstatus')
-    end,
-    group = augroup_bufferline,
-  })
-
   create_autocmd({ 'BufNewFile', 'BufReadPost' }, {
     callback = function(tbl)
       JumpMode.assign_next_letter(tbl.buf)
