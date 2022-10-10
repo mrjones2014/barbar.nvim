@@ -756,8 +756,6 @@ function render.render(update_names, refocus)
   end
 
   result = result or ''
-  -- prevent 'not enough room' error
-  result = string.sub(result, 1, math.min(#result, vim.o.columns))
 
   return result
 end
