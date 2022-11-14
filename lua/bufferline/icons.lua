@@ -70,7 +70,8 @@ return {
         extension = 'git'
       else
         basename = fnamemodify(buffer_name, ':t')
-        extension = matchstr(basename, [[\v\.@<=\w+$]], '', '')
+        -- double :e:e gets extensions like *.test.js, for example
+        extension = fnamemodify(buffer_name, ':e:e')
       end
 
       icon_char, icon_hl = web.get_icon(basename, extension, { default = true })
